@@ -1,11 +1,6 @@
 # Task Management API 
 This is a backend Task Management API developed using Laravel and MySQL. The API allows users to register, authenticate, create, update, view, and delete tasks, with support for Role-Based Access Control (RBAC) and task completion management.
 
-# Table of Contents
-Features
-Requirements
-Installation
-Usage
 
 # Features
 ## User Authentication: 
@@ -31,17 +26,8 @@ Laravel (latest stable version).
 1. Clone the Repository
 git clone https://github.com/rkiran2505/new_task_management.git
 
-2. Install Dependencies
-composer install
-
-3. Set Up Environment Variables
-cp .env.example .env 
-
-4. Generate the Application Key
-php artisan key:generate
-
-5. Run Migrations
-php artisan migrate 
-
-6. Start the Development Server
-php artisan serve
+2. Install Dependencies: composer install
+3. Set Up Environment Variables: cp .env.example .env 
+4. Generate the Application Key: php artisan key:generate
+5. Run Migrations: php artisan migrate 
+6. Start the Development Server: php artisan serve
