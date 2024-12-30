@@ -70,10 +70,7 @@ class TaskController extends Controller
                 'data' => $task
             ], 200);
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error creating task: ' . $e->getMessage(),
-            ], 400);
+            return response()->json(['success' => false,'message' => 'Error creating task: ' . $e->getMessage(),], 400);
         }
     }
 
