@@ -17,6 +17,11 @@ class UserController extends Controller
     return view('home');
 }
 
+
+public function showRegistrationForm()
+{
+    return view('auth.register');
+}
 public function register(Request $request)
 {
     // Log the registration request data
@@ -55,6 +60,10 @@ public function register(Request $request)
     ], 201); // 201 Created HTTP status code
 }
 
+public function showLoginForm()
+{
+    return view('auth.login'); // You can create this Blade view to display the form
+}
 public function login(Request $request)
 {
     $request->validate([
@@ -76,6 +85,8 @@ public function login(Request $request)
 
     return response()->json(['message' => 'Invalid credentials'], 401);
 }
+
+
 // User Logout method
 public function logout(Request $request)
 {

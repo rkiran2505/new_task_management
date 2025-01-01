@@ -17,28 +17,44 @@ class TaskController extends Controller
     public function index(Request $request)
     {
         try {
+            // Query for tasks and include the user details (name) to be displayed in the view
             $tasks = Task::with(['user:id,name'])->orderBy('id', 'desc');
-            
+    
+            // If the user is not an admin, only show their own tasks
             if (Auth::user()->role !== 'admin') {
                 $tasks->where('user_id', Auth::id());
             }
+    
+            // If user_id is provided, make sure the user has permission to view the tasks
             if ($request->has('user_id')) {
                 if (Auth::user()->role !== 'admin' && Auth::id() !== $request->user_id) {
-                    return response()->json(['success' => false, 'message' => 'You can only view your own tasks.'], 403);
+                    // Optionally, you can return an error message here or redirect
+                    return back()->with('error', 'You can only view your own tasks.');
                 }
                 $tasks->where('user_id', $request->user_id);
             }
     
+            // If a status filter is applied, use it to filter the tasks
             if ($request->has('status')) {
                 $tasks->where('status', $request->status);
             }
     
-            return response()->json(['success' => true, 'message' => 'Tasks fetched successfully', 'data' => $tasks->get()], 200);
+            // Fetch the tasks
+            $tasks = $tasks->get();
+    
+            // Return the tasks to the view
+            return view('tasks.index', compact('tasks'));
         } catch (Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Error fetching tasks: ' . $e->getMessage()], 400);
+            // Handle the error gracefully
+            return back()->with('error', 'Error fetching tasks: ' . $e->getMessage());
         }
     }
+    
 
+    public function create()
+    {
+        return view('tasks.create');
+    }
     // Store a new task
     public function store(Request $request)
     {
@@ -70,7 +86,8 @@ class TaskController extends Controller
                 'data' => $task
             ], 200);
         } catch (Exception $e) {
-            return response()->json(['success' => false,'message' => 'Error creating task: ' . $e->getMessage(),], 400);
+            return response()->json(['tasks.index' => false,'message' => 'Error creating task: ' . $e->getMessage(),], 400);
+            // return redirect()->route('tasks.index')->with('success', 'Task created successfully!');
         }
     }
 
@@ -84,46 +101,61 @@ class TaskController extends Controller
         return response()->json(['success' => true, 'data' => $task], 200);
     }
 
+
+    public function edit(Task $task)
+{
+    // Ensure the task belongs to the authenticated user
+    if ($task->user_id !== auth()->id()) {
+        return redirect()->route('tasks.index')->with('error', 'You are not authorized to edit this task.');
+    }
+
+    // Return the edit view with the task data
+    return view('tasks.edit', compact('task'));
+}
     // Update a task
-    public function update(Request $request, $task_id)
+    public function update(Request $request, Task $task)
     {
-        $task = Task::find($task_id);
-
-        if (!$task) {
-            return response()->json(['success' => false, 'message' => 'Task not found'], 404);
+        // Ensure the task belongs to the authenticated user
+        if ($task->user_id !== auth()->id()) {
+            return redirect()->route('tasks.index')->with('error', 'You are not authorized to update this task.');
         }
 
-        if ($task->user_id !== Auth::id() && Auth::user()->role !== 'admin') {
-            return response()->json(['success' => false, 'message' => 'Unauthorized access'], 403);
-        }
-
-        $validation = Validator::make($request->all(), [
+        // Validate the input
+        $request->validate([
             'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'due_date' => 'nullable|date|after:today',
-            'status' => 'nullable|string|in:pending,completed,overdue',
+            'description' => 'nullable|string',
+            'status' => 'required|in:pending,completed', // Adjust based on your status options
+            'due_date' => 'nullable|date',
         ]);
 
-        if ($validation->fails()) {
-            return response()->json(['success' => false, 'message' => $validation->errors()->first()], 400);
-        }
-
-        $task->update($request->only(['title', 'description', 'due_date', 'status']));
-        return response()->json(['success' => true, 'message' => 'Task updated successfully', 'data' => $task], 200);
+        // Update the task
+        $task->update($request->only('title', 'description', 'status', 'due_date'));
+        return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
     }
 
-    public function destroy($task_id)
+    
+    public function destroy($id)
     {
         try {
-            $task = Task::findOrFail($task_id);  
+            // Find the task by ID
+            $task = Task::findOrFail($id);
+    
+            // Check if the user is authorized to delete the task
             if ($task->user_id !== Auth::id() && Auth::user()->role !== 'admin') {
-                return response()->json(['success' => false, 'message' => 'Unauthorized access'], 403);
+                // Unauthorized access
+                return redirect()->route('tasks.index')->with('error', 'Unauthorized access');
             }
+    
+            // Delete the task
             $task->delete();
-            return response()->json(['success' => true, 'message' => 'Task deleted successfully'], 200);
+    
+            // Redirect back with success message
+            return redirect()->route('tasks.index')->with('success', 'Task deleted successfully');
             
         } catch (Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Error deleting task: ' . $e->getMessage()], 400);
+            // Catch any exception that occurs and return an error message
+            return redirect()->route('tasks.index')->with('error', 'Error deleting task: ' . $e->getMessage());
         }
     }
+    
 }
