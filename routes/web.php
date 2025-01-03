@@ -23,12 +23,7 @@ Route::post('register', [UserController::class, 'register']);
 Route::post('login', [UserController::class, 'login']);
 Route::get('login', [UserController::class, 'showLoginForm'])->name('login');
 
-// Task-related routes
-// Route::middleware(['auth'])->group(function () {
-//     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
-//     Route::get('/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
-//     Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
-// });
+
 
 Route::middleware(['auth'])->group(function () {
     // View all tasks

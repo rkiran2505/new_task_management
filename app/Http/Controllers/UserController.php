@@ -24,17 +24,14 @@ public function showRegistrationForm()
 }
 public function register(Request $request)
 {
-    // Log the registration request data
     Log::info('Registration request:', $request->all());
     
-    // Validate the request data
     $validator = Validator::make($request->all(), [
         'name' => ['required', 'string', 'max:255'],
         'email' => ['required', 'string', 'email', 'max:191', 'unique:users,email'], // Ensure unique email
         // 'password' => ['required', 'string', 'min:8', 'confirmed'],
     ]);
     
-    // If validation fails, return validation errors
     if ($validator->fails()) {
         return response()->json([
             'message' => 'Validation failed',
@@ -42,14 +39,12 @@ public function register(Request $request)
         ], 422);
     }
     
-    // Create the user
     $user = User::create([
         'name' => $request->name,
         'email' => $request->email,
         'password' => Hash::make($request->password), // Hash the password
     ]);
     
-    // Return a structured JSON response with the user's data
     return response()->json([
         'message' => 'User successfully registered',
         'user' => [
@@ -57,12 +52,12 @@ public function register(Request $request)
             'name' => $user->name,
             'email' => $user->email,
         ]
-    ], 201); // 201 Created HTTP status code
+    ], 201);
 }
 
 public function showLoginForm()
 {
-    return view('auth.login'); // You can create this Blade view to display the form
+    return view('auth.login'); 
 }
 public function login(Request $request)
 {
@@ -73,8 +68,6 @@ public function login(Request $request)
 
     if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
         $user = Auth::user();
-        
-        // Generate token for the user
         $token = $user->createToken('YourAppName')->plainTextToken;
 
         return response()->json([
@@ -90,12 +83,10 @@ public function login(Request $request)
 // User Logout method
 public function logout(Request $request)
 {
-    // Revoke the user's tokens
     $request->user()->tokens->each(function ($token) {
         $token->delete();
     });
 
-    // Return a response confirming logout
     return response()->json(['message' => 'Logged out successfully']);
 }
 }
