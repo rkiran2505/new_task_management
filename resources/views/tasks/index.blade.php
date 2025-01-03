@@ -16,7 +16,7 @@
                 <th>Description</th>
                 <th>Status</th>
                 <th>Due Date</th>
-                <th>Actions</th> <!-- Added column for actions -->
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>

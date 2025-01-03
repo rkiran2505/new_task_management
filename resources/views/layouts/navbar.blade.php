@@ -5,26 +5,33 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
+            <!-- Link to the Tasks Page -->
             <li class="nav-item active">
                 <a class="nav-link" href="{{ route('tasks.index') }}">Tasks</a>
             </li>
+
+            <!-- Link to Create Task Page -->
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('tasks.create') }}">Create Task</a>
             </li>
+
             @guest
-                <!-- Register Button -->
+                <!-- Register Button for Guests -->
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('register') }}">Register</a>
                 </li>
-                <!-- Login Button -->
+
+                <!-- Login Button for Guests -->
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('login') }}">Login</a>
                 </li>
             @else
-                <!-- User Profile Link and Logout Button -->
+                <!-- Display User's Profile when Logged In -->
                 <li class="nav-item">
                     <a class="nav-link" href="#">{{ Auth::user()->name }}</a>
                 </li>
+
+                <!-- Logout Button -->
                 <li class="nav-item">
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf

@@ -22,10 +22,13 @@
                         <a class="nav-link" href="{{ route('tasks.create') }}">Create Task</a>
                     </li>
 
-                    <!-- Display Login button only if the user is not authenticated -->
+                    <!-- Display Login and Register buttons only if the user is not authenticated -->
                     @guest
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('register') }}">Register</a>
                         </li>
                     @endguest
                 </ul>
@@ -35,7 +38,6 @@
         <div class="content mt-4">
             @yield('content')
         </div>
-
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
